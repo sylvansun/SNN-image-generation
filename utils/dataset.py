@@ -10,6 +10,7 @@ from torchvision import datasets, transforms
 class TTFSDataset(torch.utils.data.Dataset):
     def __init__(self, TTFS_path=os.path.join(str(Path.cwd()), "asset/ttfs.pkl")):
          super(TTFSDataset).__init__()
+         print("start building TTFS dataset")
          with open(TTFS_path,"rb") as f:
             self.TTFS_data = pickle.load(f)
     
@@ -33,7 +34,7 @@ class TTFS():
         for data, label in mnist_train:
             data = np.array(data)
             flatten_img = data.reshape([-1])
-            flatten_img = (flatten_img * 24.5).astype(np.int)
+            flatten_img = (flatten_img * 24.5).astype(np.int64)
             ttfs = E[flatten_img]
             TTFS_data.append(torch.tensor(ttfs.T))
         with open(save_path, "wb") as f:
@@ -81,5 +82,5 @@ def get_dataset(batch_size, data_name):
 
 
 if __name__ == "__main__":
-    ttfs = TTFS(25, "cpu")
+    ttfs = TTFS(25, "cuda")
     ttfs.build_TTFS()

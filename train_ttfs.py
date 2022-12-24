@@ -61,3 +61,5 @@ def main():
                 ttfs_image = gen_imgs.data[0]
                 ttfs.TTFS_to_image(ttfs=ttfs_image, batches_done=batches_done)
 
+if __name__ == "__main__":
+    main()
