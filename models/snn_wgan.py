@@ -53,7 +53,7 @@ class Generator(nn.Module):
         return torch.stack(mem5_rec, dim=0)
 
 class Discriminator(nn.Module):
-    def __init__(self, 
+    def __init__(self,
                  dis_inputs=28*28,
                  dis_num_hidden1=512,
                  dis_num_hidden2=256,
@@ -68,7 +68,6 @@ class Discriminator(nn.Module):
         self.lif2 = snn.Leaky(beta=beta)
         self.fc3 = nn.Linear(dis_num_hidden2, dis_num_outputs)
         self.lif3 = snn.Leaky(beta=beta)
-        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         mem1 = self.lif1.init_leaky()
@@ -86,6 +85,6 @@ class Discriminator(nn.Module):
             cur3 = self.fc3(spk2)
             spk3, mem3 = self.lif3(cur3, mem3)
             spk3_rec.append(spk3)
-            mem3_rec.append(self.sigmoid(mem3))
+            mem3_rec.append(mem3)
         
         return torch.stack(mem3_rec, dim=0)
