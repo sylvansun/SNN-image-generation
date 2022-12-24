@@ -15,8 +15,8 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import torch.nn.functional as F
 
-from hw2.models.snn import SNN
-from hw2.utils.dataset import get_dataset
+from models.snn import SNN
+from utils.dataset import get_dataset
 
 backprop.BPTT
 
