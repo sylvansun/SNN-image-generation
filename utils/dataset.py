@@ -44,7 +44,7 @@ class TTFS():
         intensity = torch.arange(0, self.step_num).to(device=self.device, dtype=torch.float) / 24
         intensity = (intensity @ ttfs) / torch.sum(ttfs, dim=0)
         img = intensity.reshape((1, 28, 28))
-        save_image(img, "images/%d.png" % batches_done,)
+        save_image(img, "images/ttfs_%d.png" % batches_done,)
 
 def get_transforms(data_name):
     if data_name == "mnist":
@@ -75,8 +75,8 @@ def get_dataset(batch_size, data_name):
         test_dataset = datasets.CIFAR10(root="data", train=False, download=True, transform=transform)
     else:
         raise Exception("Do not support such a dataset, please implement it yourself")
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     return train_loader, test_loader
 
 

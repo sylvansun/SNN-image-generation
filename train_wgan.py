@@ -62,7 +62,7 @@ def main():
             batches_done = epoch * len(train_loader) + i
             if batches_done % sample_interval == 0:
                 image = gen_imgs.data[:, 0, ].reshape([num_steps, 1, 28, 28])
-                save_image(image, "images/%d.png" % batches_done, nrow=5, normalize=True,)
+                save_image(image, "images/wgan_%d.png" % batches_done, nrow=5, normalize=True,)
 
 if __name__ == "__main__":
     main()
