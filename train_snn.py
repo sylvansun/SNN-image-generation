@@ -16,7 +16,7 @@ from torchvision import datasets, transforms
 import torch.nn.functional as F
 
 from models.snn import SNN
-from utils.dataset import get_dataset
+from dataset import get_dataset
 
 backprop.BPTT
 

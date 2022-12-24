@@ -1,16 +1,7 @@
-import snntorch as snn
-from snntorch import spikeplot as splt
-from snntorch import spikegen
-import time
-import matplotlib.pyplot as plt
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
-import matplotlib.pyplot as plt
 import numpy as np
-import itertools
 import pickle
 
 class TTFSDataset(torch.utils.data.Dataset):
@@ -55,6 +46,3 @@ class TTFS():
         intensity = (intensity @ ttfs) / torch.sum(ttfs, dim=0)
         img = intensity.reshape((1, 28, 28))
         save_image(img, "images/%d.png" % batches_done,)
-
-# ttfs = TTFS(step_num=25, mnist_path='./mnist')
-# ttfs.build_TTFS()

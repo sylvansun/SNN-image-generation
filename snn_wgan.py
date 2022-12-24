@@ -1,16 +1,10 @@
 import snntorch as snn
-from snntorch import spikeplot as splt
-from snntorch import spikegen
-import time
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
-import matplotlib.pyplot as plt
 import numpy as np
-import itertools
 
 n_epochs = 200
 batch_size = 64
