@@ -5,7 +5,7 @@ from snntorch import backprop
 from snntorch import functional as SF
 
 import torch
-from models.snn import SNN
+from models.snn_classifier import SNN
 from utils.dataset import get_dataset
 
 backprop.BPTT

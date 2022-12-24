@@ -15,11 +15,8 @@ def smooth_list(list, weight):
 
 snn = read_file_to_list("docs/acc_snn.txt")
 snn = smooth_list(snn, 0.8)
-cnn = read_file_to_list("docs/acc_cnn.txt")
-cnn = smooth_list(cnn, 0.8)
 plt.plot(snn, label="SNN")
-plt.plot(cnn, label="CNN")
 plt.legend()
 plt.xlim(-0.2, 19.2)
 plt.ylim(0.15, 0.9)
-plt.savefig("docs/acc_snn_cnn.png")
+plt.savefig("docs/acc_snn.png")
