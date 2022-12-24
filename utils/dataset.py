@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 class TTFSDataset(torch.utils.data.Dataset):
-    def __init__(self, TTFS_path=os.path.join(str(Path.cwd().parent), "asset/ttfs.pkl")):
+    def __init__(self, TTFS_path=os.path.join(str(Path.cwd()), "asset/ttfs.pkl")):
          super(TTFSDataset).__init__()
          with open(TTFS_path,"rb") as f:
             self.TTFS_data = pickle.load(f)
@@ -20,12 +20,12 @@ class TTFSDataset(torch.utils.data.Dataset):
         return len(self.TTFS_data)
 
 class TTFS():
-    def __init__(self, step_num, device,  root='../data'):
+    def __init__(self, step_num, device,  root='data'):
         self.step_num = step_num
         self.root = root
         self.device = device
 
-    def build_TTFS(self, save_path=os.path.join(str(Path.cwd().parent), "asset/ttfs.pkl")):
+    def build_TTFS(self, save_path=os.path.join(str(Path.cwd()), "asset/ttfs.pkl")):
         transform = get_transforms("mnist")
         mnist_train = datasets.MNIST(root=self.root, train=True, download=True, transform=transform)
         E = np.eye(self.step_num)
@@ -68,11 +68,11 @@ def get_transforms(data_name):
 def get_dataset(batch_size, data_name):
     transform = get_transforms(data_name)
     if data_name == "mnist":
-        train_dataset = datasets.MNIST(root="../data", train=True, download=True, transform=transform)
-        test_dataset = datasets.MNIST(root="../data", train=False, download=True, transform=transform)
+        train_dataset = datasets.MNIST(root="data", train=True, download=True, transform=transform)
+        test_dataset = datasets.MNIST(root="data", train=False, download=True, transform=transform)
     elif data_name == "cifar10":
-        train_dataset = datasets.CIFAR10(root="../data", train=True, download=True, transform=transform)
-        test_dataset = datasets.CIFAR10(root="../data", train=False, download=True, transform=transform)
+        train_dataset = datasets.CIFAR10(root="data", train=True, download=True, transform=transform)
+        test_dataset = datasets.CIFAR10(root="data", train=False, download=True, transform=transform)
     else:
         raise Exception("Do not support such a dataset, please implement it yourself")
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)

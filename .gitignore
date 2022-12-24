@@ -30,6 +30,7 @@ tutorial/
 *.pkl
 *.txt
 data/
+asset/
 checkpoint/
 
 
