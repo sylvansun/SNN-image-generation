@@ -1,22 +1,12 @@
 import matplotlib.pyplot as plt
-import numpy as np
 from tqdm import tqdm
 
-import snntorch as snn
-from snntorch import surrogate
 from snntorch import backprop
 from snntorch import functional as SF
-from snntorch import utils
-from snntorch import spikeplot as splt
 
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-import torch.nn.functional as F
-
 from models.snn import SNN
-from dataset import get_dataset
+from utils.dataset import get_dataset
 
 backprop.BPTT
 
