@@ -1,3 +1,6 @@
+import os
+import argparse
+
 import torch
 import torch.nn as nn
 from torchvision.utils import save_image
@@ -5,28 +8,33 @@ import numpy as np
 
 from models.snn_gan import Generator, Discriminator
 from utils.dataset import get_dataset
+from utils.etqdm import etqdm
 
 
-def main():
-    n_epochs = 200
-    batch_size = 64
-    sample_interval = 400
-    device = torch.device("cuda:1")
+def main(args):
+    n_epochs = args.n_epochs
+    batch_size = args.batch_size
+    sample_interval = args.sample_interval if not args.vis else 1
+    device = torch.device(f"cuda:{args.gpu}")
+    num_steps = args.num_steps
+    start_grad_step = args.start_grad_step
+    output_dir = args.output_dir
+    vis = args.vis
     dtype = torch.float
     noise_dim = 100
-    num_steps = 25
-    start_grad_step = 24
+    num_vis = 25
 
     train_loader, _ = get_dataset(batch_size, "mnist")
 
     generator = Generator(noise_dim=noise_dim, num_steps=num_steps).to(device=device, dtype=dtype)
     discriminator = Discriminator(num_steps=num_steps).to(device=device, dtype=dtype)
-    optimizer_G = torch.optim.Adam(generator.parameters(), lr=1e-4)
-    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
+    optimizer_G = torch.optim.Adam(generator.parameters(), lr=3e-4)
+    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=3e-4)
     loss = nn.BCELoss()
 
     for epoch in range(n_epochs):
-        for i, (imgs, _) in enumerate(train_loader):
+        train_bar = etqdm(train_loader, desc=f"Epoch {epoch:03d}")
+        for i, (imgs, _) in enumerate(train_bar):
             valid = torch.ones((num_steps, imgs.shape[0], 1)).to(device=device, dtype=dtype)
             fake = torch.zeros((num_steps, imgs.shape[0], 1)).to(device=device, dtype=dtype)
             real_imgs = imgs.to(device=device, dtype=dtype)
@@ -53,24 +61,27 @@ def main():
             d_loss.backward()
             optimizer_D.step()
 
-            print(
-                "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-                % (epoch, n_epochs, i, len(train_loader), d_loss.item() / 2, g_loss.item())
-            )
-
+            train_bar.set_postfix_str(f"D_loss: {d_loss.item() / 2:.4f}, G_loss: {g_loss.item():.4f}")
             batches_done = epoch * len(train_loader) + i
             if batches_done % sample_interval == 0:
-                image = gen_imgs.data[
-                    :,
-                    0,
-                ].reshape([num_steps, 1, 28, 28])
-                save_image(
-                    image,
-                    "images/gan_%d.png" % batches_done,
-                    nrow=5,
-                    normalize=True,
-                )
+                image = gen_imgs.data[-1, :num_vis].reshape([num_vis, 1, 28, 28])
+                real_image = real_imgs.data[:25, 0].reshape([-1, 1, 28, 28])
+                image = torch.cat([real_image, image], dim=0)
+                if vis:
+                    save_image(image, os.path.join(output_dir, "gan.png"), nrow=5, normalize=True)
+                else:
+                    save_image(image, os.path.join(output_dir, "gan_%d.png" % batches_done), nrow=5, normalize=True)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--gpu", type=int, default=0)
+    parser.add_argument("-b", "--batch_size", type=int, default=64)
+    parser.add_argument("-e", "--n_epochs", type=int, default=200)
+    parser.add_argument("-n", "--num_steps", type=int, default=25)
+    parser.add_argument("-s", "--start_grad_step", type=int, default=20)
+    parser.add_argument("-i", "--sample_interval", type=int, default=400)
+    parser.add_argument("-o", "--output_dir", type=str, default="images")
+    parser.add_argument("--vis", action="store_true")
+    args = parser.parse_args()
+    main(args)
