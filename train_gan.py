@@ -6,19 +6,20 @@ import numpy as np
 from models.snn_gan import Generator, Discriminator
 from utils.dataset import get_dataset
 
+
 def main():
     n_epochs = 200
     batch_size = 64
     sample_interval = 400
-    device = torch.device('cuda:1')
+    device = torch.device("cuda:1")
     dtype = torch.float
     noise_dim = 100
     num_steps = 25
     start_grad_step = 24
 
-    train_loader,_ = get_dataset(batch_size, "mnist")
+    train_loader, _ = get_dataset(batch_size, "mnist")
 
-    generator = Generator(noise_dim=noise_dim,num_steps=num_steps).to(device=device, dtype=dtype)
+    generator = Generator(noise_dim=noise_dim, num_steps=num_steps).to(device=device, dtype=dtype)
     discriminator = Discriminator(num_steps=num_steps).to(device=device, dtype=dtype)
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=1e-4)
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
@@ -59,8 +60,17 @@ def main():
 
             batches_done = epoch * len(train_loader) + i
             if batches_done % sample_interval == 0:
-                image = gen_imgs.data[:, 0, ].reshape([num_steps, 1, 28, 28])
-                save_image(image, "images/gan_%d.png" % batches_done, nrow=5, normalize=True,)
+                image = gen_imgs.data[
+                    :,
+                    0,
+                ].reshape([num_steps, 1, 28, 28])
+                save_image(
+                    image,
+                    "images/gan_%d.png" % batches_done,
+                    nrow=5,
+                    normalize=True,
+                )
+
 
 if __name__ == "__main__":
     main()

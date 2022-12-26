@@ -5,12 +5,13 @@ import numpy as np
 from utils.dataset import TTFSDataset, TTFS
 from models.snn_ttfs import Generator, Discriminator
 
+
 def main():
     n_epochs = 200
     batch_size = 64
     sample_interval = 400
     clip_value = 0.1
-    device = torch.device('cuda:1')
+    device = torch.device("cuda:1")
     dtype = torch.float
     mnist_train = TTFSDataset()
     train_loader = DataLoader(mnist_train, batch_size=batch_size, shuffle=True, drop_last=True)
@@ -18,7 +19,7 @@ def main():
     noise_dim = 100
     num_steps = 25
 
-    generator = Generator(noise_dim=noise_dim,num_steps=num_steps).to(device=device, dtype=dtype)
+    generator = Generator(noise_dim=noise_dim, num_steps=num_steps).to(device=device, dtype=dtype)
     discriminator = Discriminator(num_steps=num_steps).to(device=device, dtype=dtype)
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=1e-4)
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
@@ -30,7 +31,9 @@ def main():
             weight = weight.to(device)
             real_imgs = imgs.to(device=device, dtype=dtype)
 
-            z = torch.tensor(np.random.normal(0, 1, (imgs.shape[0], num_steps, noise_dim))).to(device=device, dtype=dtype)
+            z = torch.tensor(np.random.normal(0, 1, (imgs.shape[0], num_steps, noise_dim))).to(
+                device=device, dtype=dtype
+            )
 
             optimizer_G.zero_grad()
             gen_imgs = generator(z)
@@ -60,6 +63,7 @@ def main():
             if batches_done % sample_interval == 0:
                 ttfs_image = gen_imgs.data[0]
                 ttfs.TTFS_to_image(ttfs=ttfs_image, batches_done=batches_done)
+
 
 if __name__ == "__main__":
     main()

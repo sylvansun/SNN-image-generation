@@ -4,16 +4,18 @@ import torch.nn as nn
 
 
 class Generator(nn.Module):
-    def __init__(self,
-                 noise_dim = 100,
-                 gen_num_hidden1 = 100,
-                 gen_num_hidden2 = 400,
-                 gen_num_outputs = 28*28,
-                 num_steps = 25,
-                 beta = 0.95,
-                 reward_scale = 2):
+    def __init__(
+        self,
+        noise_dim=100,
+        gen_num_hidden1=100,
+        gen_num_hidden2=400,
+        gen_num_outputs=28 * 28,
+        num_steps=25,
+        beta=0.95,
+        reward_scale=2,
+    ):
         super().__init__()
-        self.num_steps  = num_steps
+        self.num_steps = num_steps
         self.reward_scale = reward_scale
         self.fc1 = nn.Linear(noise_dim, gen_num_hidden1)
         self.lif1 = snn.Leaky(beta=beta)
@@ -46,17 +48,20 @@ class Generator(nn.Module):
             spk3_rec.append(spk3)
             mem3_rec.append(self.sigmoid(mem3))
 
-        return torch.stack(spk3_rec, dim=1) # bz, 25, 28*28
+        return torch.stack(spk3_rec, dim=1)  # bz, 25, 28*28
+
 
 class Discriminator(nn.Module):
-    def __init__(self,
-                 dis_inputs = 28*28,
-                 dis_num_hidden1 = 400,
-                 dis_num_hidden2 = 100,
-                 dis_num_outputs = 1,
-                 num_steps = 25,
-                 beta = 0.95,
-                 reward_scale = 2):
+    def __init__(
+        self,
+        dis_inputs=28 * 28,
+        dis_num_hidden1=400,
+        dis_num_hidden2=100,
+        dis_num_outputs=1,
+        num_steps=25,
+        beta=0.95,
+        reward_scale=2,
+    ):
         super().__init__()
         self.num_steps = num_steps
         self.reward_scale = reward_scale
@@ -89,5 +94,5 @@ class Discriminator(nn.Module):
             spk3, mem3 = self.lif3(cur3, mem3)
             spk3_rec.append(spk3)
             mem3_rec.append(mem3)
-        
+
         return torch.stack(mem3_rec, dim=1)

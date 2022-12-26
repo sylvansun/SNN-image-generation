@@ -7,21 +7,23 @@ from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
+
 class TTFSDataset(torch.utils.data.Dataset):
     def __init__(self, TTFS_path=os.path.join(str(Path.cwd()), "asset/ttfs.pkl")):
-         super(TTFSDataset).__init__()
-         print("start building TTFS dataset")
-         with open(TTFS_path,"rb") as f:
+        super(TTFSDataset).__init__()
+        print("start building TTFS dataset")
+        with open(TTFS_path, "rb") as f:
             self.TTFS_data = pickle.load(f)
-    
+
     def __getitem__(self, i):
-         return self.TTFS_data[i]
+        return self.TTFS_data[i]
 
     def __len__(self):
         return len(self.TTFS_data)
 
-class TTFS():
-    def __init__(self, step_num, device,  root='data'):
+
+class TTFS:
+    def __init__(self, step_num, device, root="data"):
         self.step_num = step_num
         self.root = root
         self.device = device
@@ -45,22 +47,26 @@ class TTFS():
         intensity = torch.arange(0, self.step_num).to(device=self.device, dtype=torch.float) / 24
         intensity = (intensity @ ttfs) / torch.sum(ttfs, dim=0)
         img = intensity.reshape((1, 28, 28))
-        save_image(img, "images/ttfs_%d.png" % batches_done,)
+        save_image(
+            img,
+            "images/ttfs_%d.png" % batches_done,
+        )
+
 
 def get_transforms(data_name):
     if data_name == "mnist":
-        transform = transforms.Compose([
-            transforms.Resize((28, 28)),
-            transforms.Grayscale(),
-            transforms.ToTensor(),
-            transforms.Normalize((0,), (1,))
-            ])
+        transform = transforms.Compose(
+            [
+                transforms.Resize((28, 28)),
+                transforms.Grayscale(),
+                transforms.ToTensor(),
+                transforms.Normalize((0,), (1,)),
+            ]
+        )
     elif data_name == "cifar10":
-        transform = transforms.Compose([
-            transforms.Resize((32, 32)),
-            transforms.ToTensor(),
-            transforms.Normalize((0,), (1,))
-            ])
+        transform = transforms.Compose(
+            [transforms.Resize((32, 32)), transforms.ToTensor(), transforms.Normalize((0,), (1,))]
+        )
     else:
         raise Exception("Do not support transform for such a dataset")
     return transform

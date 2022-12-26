@@ -8,6 +8,7 @@ import torch.nn.functional as F
 
 backprop.BPTT
 
+
 class SNN(nn.Module):
     def __init__(self):
         super().__init__()
