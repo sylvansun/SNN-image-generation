@@ -19,6 +19,7 @@ def main(args):
     num_steps = args.num_steps
     start_grad_step = args.start_grad_step
     output_dir = args.output_dir
+    os.makedirs(output_dir, exist_ok=True)
     vis = args.vis
     dtype = torch.float
     noise_dim = 100
