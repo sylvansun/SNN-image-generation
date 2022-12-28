@@ -89,3 +89,9 @@ class Discriminator(nn.Module):
             mem3_rec.append(self.sigmoid(mem3))
 
         return torch.stack(mem3_rec, dim=0)
+
+if __name__ == "__main__":
+    gen = Generator()
+    dis = Discriminator()
+    print(gen)
+    print(dis)
