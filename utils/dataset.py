@@ -6,7 +6,6 @@ from pathlib import Path
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from snntorch.spikevision import spikedata
 
 
 class TTFSDataset(torch.utils.data.Dataset):
