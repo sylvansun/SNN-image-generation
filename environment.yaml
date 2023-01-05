@@ -1,0 +1,15 @@
+name: snnigc
+
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - pip
+  - pytorch
+  - torchvision
+  - matplotlib
+  - numpy
+  - snntorch
+
