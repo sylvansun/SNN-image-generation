@@ -1,5 +1,5 @@
 <h1 align="center">
-ASIGN: Auto-Snn for Image GeNeration
+Could SNN Beat ANN on Image Synthesis
 </h1>
 <p align="center">
 Project of AI3610 Brain-inspired Intelligence, Shanghai Jiao Tong University.
@@ -10,10 +10,7 @@ Project of AI3610 Brain-inspired Intelligence, Shanghai Jiao Tong University.
 
 
 The contributions of this project are as follows:
-
-- Implemented a Spiking Neural Network generator. This generator is able to take the Networks built up by traditional Modules from pytorch (nn.Module) as input, 
-and 
-- ANN-Guided SNN GAN blablabla
+- We compared various types of Generators and Discriminators in the GAN framework, and found that the SNN-based Generator
 
 
 ## Installation
@@ -51,8 +48,6 @@ data
 
 ## Explanation for the scripts
 To be written
-
-
 
 
 ## For TAs
