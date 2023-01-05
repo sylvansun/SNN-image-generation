@@ -36,6 +36,7 @@ def main(args):
     for epoch in range(n_epochs):
         train_bar = etqdm(train_loader, desc=f"Epoch {epoch:03d}")
         for i, (imgs, _) in enumerate(train_bar):
+            imgs = 1 - imgs
             valid = torch.ones((num_steps, imgs.shape[0], 1)).to(device=device, dtype=dtype)
             fake = torch.zeros((num_steps, imgs.shape[0], 1)).to(device=device, dtype=dtype)
             real_imgs = imgs.to(device=device, dtype=dtype)
