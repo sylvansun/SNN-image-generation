@@ -6,8 +6,7 @@ import torch.nn as nn
 from torchvision.utils import save_image
 import numpy as np
 
-from models.snn_conv_gan import Discriminator
-from models.ann_gan import Generator
+from models.snn_conv_gan import Discriminator, Generator
 from utils.dataset import get_dataset
 from snntorch import functional as SF
 from utils.etqdm import etqdm
