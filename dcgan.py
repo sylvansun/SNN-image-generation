@@ -1,29 +1,15 @@
-import argparse
 import os
 import numpy as np
-import snntorch as snn
-
+import torch
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
-
-from torch.utils.data import DataLoader
 from torchvision import datasets
 from torch.autograd import Variable
 
-import torch.nn as nn
-import torch.nn.functional as F
-import torch
 from utils.parser import make_parser
 from utils.etqdm import etqdm
+from utils.dataset import get_dataset
 from models.model_zoo import Gen, GenFront, GenMid, GenBack, Dis, DisSpike
-
-os.makedirs("images", exist_ok=True)
-
-parser = make_parser()
-args = parser.parse_args()
-print(args)
-
-cuda = True if torch.cuda.is_available() else False
 
 
 def weights_init_normal(m):
@@ -42,93 +28,59 @@ def make_discriminator(args):
     models = {"ann": Dis(args), "snn": DisSpike(args)}
     return models[args.dis]
 
-# Loss function
-adversarial_loss = torch.nn.BCELoss()
 
-# Initialize generator and discriminator
-generator = make_generator(args)
-discriminator = make_discriminator(args)
-save_img_dir = os.path.join(args.output_dir, "dcgan" , args.gen + "_" + args.dis)
+def main(args):
+    adversarial_loss = torch.nn.BCELoss()
+    generator = make_generator(args)
+    discriminator = make_discriminator(args)
+    save_img_dir = os.path.join(args.output_dir, "dcgan" , args.gen + "_" + args.dis)
+    os.makedirs(save_img_dir, exist_ok=True)
 
-if cuda:
-    generator.cuda()
-    discriminator.cuda()
-    adversarial_loss.cuda()
+    if cuda:
+        generator.cuda()
+        discriminator.cuda()
+        adversarial_loss.cuda()
 
-# Initialize weights
-generator.apply(weights_init_normal)
-discriminator.apply(weights_init_normal)
+    generator.apply(weights_init_normal)
+    discriminator.apply(weights_init_normal)
 
-# Configure data loader
-os.makedirs("./data/mnist", exist_ok=True)
-dataloader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        "./data/mnist",
-        train=True,
-        download=True,
-        transform=transforms.Compose(
-            [transforms.Resize(args.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
-        ),
-    ),
-    batch_size=args.batch_size,
-    shuffle=True,
-)
+    dataloader,_ = get_dataset(args.batch_size, args.img_size)
 
-# Optimizers
-optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
-optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
+    optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
+    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
 
-Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
-# ----------
-#  Training
-# ----------
+    for epoch in range(args.n_epochs):
+        for i, (imgs, _) in enumerate(dataloader):
 
-for epoch in range(args.n_epochs):
-    for i, (imgs, _) in enumerate(dataloader):
+            valid = Variable(Tensor(imgs.shape[0], 1).fill_(1.0), requires_grad=False)
+            fake = Variable(Tensor(imgs.shape[0], 1).fill_(0.0), requires_grad=False)
+            real_imgs = Variable(imgs.type(Tensor))
 
-        # Adversarial ground truths
-        valid = Variable(Tensor(imgs.shape[0], 1).fill_(1.0), requires_grad=False)
-        fake = Variable(Tensor(imgs.shape[0], 1).fill_(0.0), requires_grad=False)
+            for _ in range(1):
+                optimizer_G.zero_grad()
+                z = Variable(Tensor(np.random.normal(0, 1, (imgs.shape[0], args.latent_dim))))
+                gen_imgs = generator(z)
+                g_loss = adversarial_loss(discriminator(gen_imgs), valid)
+                g_loss.backward()
+                optimizer_G.step()
+            optimizer_D.zero_grad()
+            real_loss = adversarial_loss(discriminator(real_imgs), valid)
+            fake_loss = adversarial_loss(discriminator(gen_imgs.detach()), fake)
+            d_loss = (real_loss + fake_loss) / 2
+            d_loss.backward()
+            optimizer_D.step()
+            print(
+                "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
+                % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
+            )
+        save_image(gen_imgs.data[:25], os.path.join(save_img_dir , f"{epoch}.png"), nrow=5, normalize=True)
 
-        # Configure input
-        real_imgs = Variable(imgs.type(Tensor))
-
-        # -----------------
-        #  Train Generator
-        # -----------------
-        for _ in range(1):
-            optimizer_G.zero_grad()
-
-            # Sample noise as generator input
-            z = Variable(Tensor(np.random.normal(0, 1, (imgs.shape[0], args.latent_dim))))
-
-            # Generate a batch of images
-            gen_imgs = generator(z)
-
-            # Loss measures generator's ability to fool the discriminator
-            g_loss = adversarial_loss(discriminator(gen_imgs), valid)
-
-            g_loss.backward()
-            optimizer_G.step()
-
-        # ---------------------
-        #  Train Discriminator
-        # ---------------------
-
-        optimizer_D.zero_grad()
-
-        # Measure discriminator's ability to classify real from generated samples
-        real_loss = adversarial_loss(discriminator(real_imgs), valid)
-        fake_loss = adversarial_loss(discriminator(gen_imgs.detach()), fake)
-        d_loss = (real_loss + fake_loss) / 2
-
-        d_loss.backward()
-        optimizer_D.step()
-
-        print(
-            "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-            % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
-        )
-
-    save_image(gen_imgs.data[:25], os.path.join(save_img_dir , f"{epoch}.png"), nrow=5, normalize=True)
+if __name__ == "__main__":
+    parser = make_parser()
+    args = parser.parse_args()
+    print(args)
+    cuda = True if torch.cuda.is_available() else False
+    
+    main(args)

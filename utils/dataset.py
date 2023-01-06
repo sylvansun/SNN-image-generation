@@ -53,11 +53,11 @@ class TTFS:
         )
 
 
-def get_transforms(data_name):
+def get_transforms(data_name, img_size=28):
     if data_name == "mnist":
         transform = transforms.Compose(
             [
-                transforms.Resize((28, 28)),
+                transforms.Resize((img_size, img_size)),
                 transforms.Grayscale(),
                 transforms.ToTensor(),
                 transforms.Normalize((0,), (1,)),
@@ -72,8 +72,8 @@ def get_transforms(data_name):
     return transform
 
 
-def get_dataset(batch_size, data_name):
-    transform = get_transforms(data_name)
+def get_dataset(batch_size, data_name, img_size=28):
+    transform = get_transforms(data_name, img_size)
     if data_name == "mnist":
         train_dataset = datasets.MNIST(root="data", train=True, download=True, transform=transform)
         test_dataset = datasets.MNIST(root="data", train=False, download=True, transform=transform)
