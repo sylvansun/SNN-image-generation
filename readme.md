@@ -49,13 +49,16 @@ data
 ## Explanation for the scripts
 We support 4 types of Generators and 2 types of Discriminators for now.To train the models, simply run the script with the corresponding arguments as shown below:
 ```shell
-$ python dcgan.py --gen [Generator type] --dis [Discriminator type]
+$ python dcgan.py --gen [Generator type] --dis [Discriminator type] -b [batch size] -c [number of channels]
 ```
+where the number of channels indicates the channels of image we want to generate.
 The generators should be selected from 
 ```shell
-["ann", "front", "mid", "back"]
+["modular", "ann", "front", "mid", "back"]
 ```
-and the discriminators should be selected from
+The argument "modular" indicates that the generator is composed of a convolutional encoder, a spiking extractor and a convolutional decoder. The arguments "front", "mid" and "back" indicate that the generator has a spiking layer, and the argument states the position where we put this layer. The argument "ann" indicates that the generator is a standard ANN-based generator.
+
+The discriminators should be selected from
 ```shell
 ["ann", "snn"]
 ```
