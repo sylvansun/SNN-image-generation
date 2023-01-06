@@ -75,7 +75,11 @@ def main(args):
                 "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
                 % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
             )
-        save_image(gen_imgs.data[:25], os.path.join(save_img_dir , f"{epoch}.png"), nrow=5, normalize=True)
+        
+        if args.vis:
+            save_image(gen_imgs.data[:25], os.path.join(save_img_dir , "vis.png"), nrow=5, normalize=True)
+        else:
+            save_image(gen_imgs.data[:25], os.path.join(save_img_dir , f"{epoch}.png"), nrow=5, normalize=True)
 
 if __name__ == "__main__":
     parser = make_parser()
