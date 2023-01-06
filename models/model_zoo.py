@@ -73,8 +73,6 @@ class GenMid(nn.Module):
         self.bn3 = nn.BatchNorm2d(64, 0.8)
         self.lrelu2 = nn.LeakyReLU(0.2, inplace=True)
         self.conv3 = nn.Conv2d(64, args.channels, 3, stride=1, padding=1)
-        self.fc_last = nn.Linear(1024, 1024)
-        self.conv_last = nn.Conv2d(self.Num, 1, 3, stride=1, padding=1)
         self.tanh = nn.Tanh()
         self.lif1 = snn.Leaky(beta=0.95)
 
@@ -97,16 +95,10 @@ class GenMid(nn.Module):
             spk_rec.append(spk)
             mem_rec.append(mem)
         out = torch.stack(spk_rec, dim=0).reshape(B, -1, 32, 32)
-        
         out = self.conv2(out)
         out = self.bn3(out)
         out = self.lrelu2(out)
         out = self.conv3(out)
-
-        # out = self.conv_last(spk_rec.transpose(0, 1).reshape(B, -1, 32, 32))
-        # out = F.relu(out)
-        # out = self.fc_last(out.view(B, -1))
-        # out = out.view(B, 1, 32, 32)
         out = self.tanh(out)
         return out
 
@@ -261,7 +253,6 @@ class DisSpike(nn.Module):
         validity = self.adv_layer(out)
         return validity
     
-    
 class Dis(nn.Module):
     def __init__(self, args):
         super().__init__()
@@ -307,3 +298,75 @@ class Dis(nn.Module):
         out = out.view(B, -1)
         validity = self.adv_layer(out)
         return validity
+    
+
+class Encoder(nn.Module):
+    def __init__(self,args):
+        super().__init__()
+        self.init_size = args.img_size // 4
+        self.Num = 100
+        self.l1 = nn.Linear(args.latent_dim, 128 * self.init_size ** 2)
+        self.bn1 = nn.BatchNorm2d(128)
+        self.up1 = nn.Upsample(scale_factor=2)
+        self.conv1 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
+        self.bn2 = nn.BatchNorm2d(128, 0.8)
+        self.lrelu1 = nn.LeakyReLU(0.2, inplace=True)
+        self.up2 = nn.Upsample(scale_factor=2)
+    def forward(self, z):
+        out = self.l1(z)
+        out = out.view(out.shape[0], 128, self.init_size, self.init_size)
+        out = self.bn1(out)
+        out = self.up1(out)
+        out = self.conv1(out)
+        out = self.bn2(out)
+        out = self.lrelu1(out)
+        out = self.up2(out)
+        return out
+    
+class SNNExtractor(nn.Module):
+    def __init__(self,args):
+        super().__init__()
+        self.Num = 100
+        self.args = args
+        self.lif1 = snn.Leaky(beta=0.95)
+    
+    def forward(self, x):
+        mem = self.lif1.init_leaky()
+        spk_rec = []
+        mem_rec = []
+        for _ in range(self.Num):
+            spk, mem = self.lif1(x, mem)
+            spk_rec.append(spk)     
+            mem_rec.append(mem)
+        spk_rec = torch.stack(spk_rec, dim=0)
+        return torch.stack(spk_rec, dim=0).reshape(self.args.batch_size, -1, 32, 32)
+    
+class Decoder(nn.Module):
+    def __init__(self,args):
+        super().__init__()
+        self.conv1 = nn.Conv2d(self.Num * 128, 64, 3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(64, 0.8)
+        self.lrelu = nn.LeakyReLU(0.2, inplace=True)
+        self.conv2 = nn.Conv2d(64, args.channels, 3, stride=1, padding=1)
+        self.tanh = nn.Tanh()
+        
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.lrelu(out)
+        out = self.conv2(out)
+        out = self.tanh(out)
+        return out
+    
+    
+class GenModular(nn.Module):
+    def init(self, args):
+        super().__init__()
+        self.encoder = Encoder(args)
+        self.extractor = SNNExtractor(args)
+        self.decoder = Decoder(args)
+    def forward(self, z):
+        out = self.encoder(z)
+        out = self.extractor(out)
+        out = self.decoder(out)
+        return out

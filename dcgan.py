@@ -9,7 +9,7 @@ from torch.autograd import Variable
 from utils.parser import make_parser
 from utils.etqdm import etqdm
 from utils.dataset import get_dataset
-from models.model_zoo import Gen, GenFront, GenMid, GenBack, Dis, DisSpike
+from models.model_zoo import Gen, GenFront, GenMid, GenBack, GenModular, Dis, DisSpike
 
 
 def weights_init_normal(m):
@@ -21,7 +21,7 @@ def weights_init_normal(m):
         torch.nn.init.constant_(m.bias.data, 0.0)
 
 def make_generator(args):
-    models = {"front": GenFront(args), "mid": GenMid(args), "back": GenBack(args), "ann": Gen(args)}
+    models = {"front": GenFront(args), "mid": GenMid(args), "back": GenBack(args), "ann": Gen(args), "modular": GenModular(args)}
     return models[args.gen]
 
 def make_discriminator(args):
@@ -46,7 +46,8 @@ def main(args):
     generator.apply(weights_init_normal)
     discriminator.apply(weights_init_normal)
 
-    dataloader,_ = get_dataset(args.batch_size, "mnist", args.img_size)
+    data_name = "mnist" if args.channels == 1 else "cifar10"
+    dataloader,_ = get_dataset(args.batch_size, data_name, args.img_size)
 
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
