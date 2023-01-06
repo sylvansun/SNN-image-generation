@@ -304,7 +304,7 @@ class Encoder(nn.Module):
     def __init__(self,args):
         super().__init__()
         self.init_size = args.img_size // 4
-        self.Num = 100
+        self.Num = args.num_steps
         self.l1 = nn.Linear(args.latent_dim, 128 * self.init_size ** 2)
         self.bn1 = nn.BatchNorm2d(128)
         self.up1 = nn.Upsample(scale_factor=2)
@@ -326,7 +326,7 @@ class Encoder(nn.Module):
 class SNNExtractor(nn.Module):
     def __init__(self,args):
         super().__init__()
-        self.Num = 100
+        self.Num = args.num_steps
         self.args = args
         self.lif1 = snn.Leaky(beta=0.95)
     
@@ -344,7 +344,7 @@ class SNNExtractor(nn.Module):
 class Decoder(nn.Module):
     def __init__(self,args):
         super().__init__()
-        self.conv1 = nn.Conv2d(self.Num * 128, 64, 3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(args.num_steps * 128, 64, 3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64, 0.8)
         self.lrelu = nn.LeakyReLU(0.2, inplace=True)
         self.conv2 = nn.Conv2d(64, args.channels, 3, stride=1, padding=1)
