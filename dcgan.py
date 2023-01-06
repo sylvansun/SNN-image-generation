@@ -34,7 +34,9 @@ def main(args):
     generator = make_generator(args)
     discriminator = make_discriminator(args)
     save_img_dir = os.path.join(args.output_dir, "dcgan" , args.gen + "_" + args.dis)
+    save_model_dir = "asset/model_saved"
     os.makedirs(save_img_dir, exist_ok=True)
+    os.makedirs(save_model_dir, exist_ok=True)
 
     if cuda:
         generator.cuda()
@@ -51,7 +53,7 @@ def main(args):
 
     Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
-    for epoch in range(args.n_epochs):
+    for epoch in range(1, args.n_epochs + 1):
         for i, (imgs, _) in enumerate(dataloader):
 
             valid = Variable(Tensor(imgs.shape[0], 1).fill_(1.0), requires_grad=False)
@@ -75,6 +77,12 @@ def main(args):
                 "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
                 % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
             )
+        
+        if epoch % 50 == 0:
+            gen_name = os.path.join(save_model_dir, f"gen_{args.gen}_{epoch}.pt")
+            dis_name = os.path.join(save_model_dir, f"dis_{args.dis}_{epoch}.pt")
+            torch.save(generator, gen_name)
+            torch.save(discriminator, dis_name)
         
         if args.vis:
             save_image(gen_imgs.data[:25], os.path.join(save_img_dir , "vis.png"), nrow=5, normalize=True)

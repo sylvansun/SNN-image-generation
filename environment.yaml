@@ -1,4 +1,4 @@
-name: snnigc
+name: snngan
 
 channels:
   - pytorch

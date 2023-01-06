@@ -28,7 +28,7 @@ Set up a new environment:
 
 ```shell
 $ conda env create -f environment.yaml
-$ conda activate snnigc
+$ conda activate snngan
 ```
 
 ### Download assets and process data
@@ -47,7 +47,19 @@ data
 
 
 ## Explanation for the scripts
-To be written
+We support 4 types of Generators and 2 types of Discriminators for now.To train the models, simply run the script with the corresponding arguments as shown below:
+```shell
+$ python dcgan.py --gen [Generator type] --dis [Discriminator type]
+```
+The generators should be selected from 
+```shell
+["ann", "front", "mid", "back"]
+```
+and the discriminators should be selected from
+```shell
+["ann", "snn"]
+```
+The images will be generated every epoch and saved in the folder `images/` with corresponding generator and discriminator. The models will be saved in the folder `asset/model_saved/`.
 
 
 ## For TAs
