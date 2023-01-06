@@ -35,7 +35,7 @@ def weights_init_normal(m):
         torch.nn.init.constant_(m.bias.data, 0.0)
 
 def make_generator(args):
-    models = {"front": GenFront(args), "mid": GenMid(args), "back": GenBack(args), "gen": Gen(args)}
+    models = {"front": GenFront(args), "mid": GenMid(args), "back": GenBack(args), "ann": Gen(args)}
     return models[args.gen]
 
 def make_discriminator(args):
