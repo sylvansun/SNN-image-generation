@@ -33,7 +33,8 @@ def main(args):
     adversarial_loss = torch.nn.BCELoss()
     generator = make_generator(args)
     discriminator = make_discriminator(args)
-    save_img_dir = os.path.join(args.output_dir, "dcgan" , args.gen + "_" + args.dis)
+    data_name = "mnist" if args.channels == 1 else "cifar10"
+    save_img_dir = os.path.join(args.output_dir, "dcgan" ,data_name, args.gen + "_" + args.dis)
     save_model_dir = "asset/model_saved"
     os.makedirs(save_img_dir, exist_ok=True)
     os.makedirs(save_model_dir, exist_ok=True)
@@ -46,7 +47,6 @@ def main(args):
     generator.apply(weights_init_normal)
     discriminator.apply(weights_init_normal)
 
-    data_name = "mnist" if args.channels == 1 else "cifar10"
     dataloader,_ = get_dataset(args.batch_size, data_name, args.img_size)
 
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))

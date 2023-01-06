@@ -339,7 +339,7 @@ class SNNExtractor(nn.Module):
             spk_rec.append(spk)     
             mem_rec.append(mem)
         spk_rec = torch.stack(spk_rec, dim=0)
-        return torch.stack(spk_rec, dim=0).reshape(self.args.batch_size, -1, 32, 32)
+        return spk_rec.reshape(self.args.batch_size, -1, 32, 32)
     
 class Decoder(nn.Module):
     def __init__(self,args):
