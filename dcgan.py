@@ -44,7 +44,7 @@ def main(args):
     generator.apply(weights_init_normal)
     discriminator.apply(weights_init_normal)
 
-    dataloader,_ = get_dataset(args.batch_size, args.img_size)
+    dataloader,_ = get_dataset(args.batch_size, "mnist", args.img_size)
 
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.b1, args.b2))
