@@ -131,4 +131,4 @@ for epoch in range(args.n_epochs):
             % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
         )
 
-    save_image(gen_imgs.data[:25], save_img_dir + f"{epoch}.png", nrow=5, normalize=True)
+    save_image(gen_imgs.data[:25], os.path.join(save_img_dir , f"{epoch}.png"), nrow=5, normalize=True)
