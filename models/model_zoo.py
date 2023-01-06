@@ -360,7 +360,7 @@ class Decoder(nn.Module):
     
     
 class GenModular(nn.Module):
-    def init(self, args):
+    def __init__(self, args):
         super().__init__()
         self.encoder = Encoder(args)
         self.extractor = SNNExtractor(args)
