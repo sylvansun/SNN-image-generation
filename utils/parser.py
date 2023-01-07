@@ -17,4 +17,5 @@ def make_parser():
     parser.add_argument("--vis", action="store_true")
     parser.add_argument("--gen", choices=["front", "mid", "back", "ann", "modular"], default="modular")
     parser.add_argument("--dis", choices=["snn", "ann"], default="ann")
+    parser.add_argument("-gc", "--gen_channels", type=list, default=[128, 128, 64], help="number of channels in each layer of generator")
     return parser

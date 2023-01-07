@@ -86,8 +86,8 @@ def main(args):
             bar.set_postfix_str("D loss: %.3f， G loss: %.3f" % (d_loss.item(), g_loss.item()))
 
         if epoch % 50 == 0:
-            gen_name = os.path.join(save_model_dir, f"gen_{args.gen}_{epoch}.pt")
-            dis_name = os.path.join(save_model_dir, f"dis_{args.dis}_{epoch}.pt")
+            gen_name = os.path.join(save_model_dir, f"gen_{args.gen}_with_{args.dis}_{epoch}.pt")
+            dis_name = os.path.join(save_model_dir, f"dis_{args.gen}_with_{args.dis}_{epoch}.pt")
             torch.save(generator, gen_name)
             torch.save(discriminator, dis_name)
 
