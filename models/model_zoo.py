@@ -323,8 +323,7 @@ class SNNExtractor(nn.Module):
         self.lif2 = snn.Leaky(beta=0.95)
         self.lif3 = snn.Leaky(beta=0.95)
         self.conv1 = nn.Conv2d(128,32,1)
-        self.conv2 = nn.Conv2d(32,16,1)
-        # self.fc_last = nn.Linear()   
+        self.conv2 = nn.Conv2d(32,16,1)   
     
     def forward(self, x):
         mem1 = self.lif1.init_leaky()

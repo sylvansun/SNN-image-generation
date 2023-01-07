@@ -44,12 +44,9 @@ def main(args):
             for _ in range(1):
                 optimizer_G.zero_grad()
                 gen_imgs, _ = generator(z) # num_steps * BS * 28^2
-                # print(spk.max(), spk.min())
-                # print(gen_imgs.max(), gen_imgs.min())
                 g_loss = 0
                 for step in range(start_grad_step, num_steps):
                     pred, _ = discriminator(gen_imgs)
-                    # pred = torch.cat([1 - pred, pred], dim=2)
                     g_loss += loss(pred, valid)
                 g_loss = g_loss / (num_steps - start_grad_step)
                 g_loss.backward()
@@ -61,8 +58,6 @@ def main(args):
             for step in range(start_grad_step, num_steps):
                 real_pred, _ = discriminator(real_imgs.reshape(batch_size, -1))
                 fake_pred, _ = discriminator(gen_imgs)
-                # real_pred = torch.cat([1 - real_pred, real_pred], dim=2)
-                # fake_pred = torch.cat([1 - fake_pred, fake_pred], dim=2)
                 real_loss = loss(real_pred, valid)
                 fake_loss = loss(fake_pred, fake)
                 d_loss += (fake_loss + real_loss) / 2

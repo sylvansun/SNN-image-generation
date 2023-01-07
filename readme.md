@@ -1,5 +1,5 @@
 <h1 align="center">
-Could SNN Beat ANN on Image Synthesis
+Could SNN Beat ANN on Image Synthesis?
 </h1>
 <p align="center">
 Project of AI3610 Brain-inspired Intelligence, Shanghai Jiao Tong University.
@@ -10,7 +10,7 @@ Project of AI3610 Brain-inspired Intelligence, Shanghai Jiao Tong University.
 
 
 The contributions of this project are as follows:
-- We compared various types of Generators and Discriminators in the GAN framework, and found that the SNN-based Generator
+- We compared various types of Generators and Discriminators in the GAN framework, and found that the SNN-based Generator can generate images comparable to the ones generated ANN-based Generator.
 
 
 ## Installation
@@ -64,11 +64,6 @@ The discriminators should be selected from
 ```
 The images will be generated every epoch and saved in the folder `images/` with corresponding generator and discriminator. The models will be saved in the folder `asset/model_saved/`.
 
-
-## For TAs
-
-
-## Acknowledgement
 
 
 

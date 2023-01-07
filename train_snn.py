@@ -13,7 +13,6 @@ backprop.BPTT
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # Load the dataset
     batch_size = 256
     train_loader, test_loader = get_dataset(batch_size=batch_size, data_name="cifar10")
     model = SNN().to(device)
