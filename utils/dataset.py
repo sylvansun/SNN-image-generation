@@ -55,7 +55,7 @@ class TTFS:
 
 def get_transforms(data_name, img_size=28):
     if data_name == "mnist":
-        transform=transforms.Compose(
+        transform = transforms.Compose(
             [transforms.Resize(img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
         )
     elif data_name == "cifar10":

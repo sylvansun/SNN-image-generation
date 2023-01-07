@@ -40,10 +40,12 @@ def main(args):
             valid = torch.ones((imgs.shape[0])).to(device=device, dtype=torch.int64)
             fake = torch.zeros((imgs.shape[0])).to(device=device, dtype=torch.int64)
             real_imgs = imgs.to(device=device, dtype=dtype)
-            z = torch.tensor(np.random.normal(0, 1, (imgs.shape[0], noise_dim))).to(device=device, dtype=dtype) #BS*noise_dim
+            z = torch.tensor(np.random.normal(0, 1, (imgs.shape[0], noise_dim))).to(
+                device=device, dtype=dtype
+            )  # BS*noise_dim
             for _ in range(1):
                 optimizer_G.zero_grad()
-                gen_imgs, _ = generator(z) # num_steps * BS * 28^2
+                gen_imgs, _ = generator(z)  # num_steps * BS * 28^2
                 g_loss = 0
                 for step in range(start_grad_step, num_steps):
                     pred, _ = discriminator(gen_imgs)
@@ -68,7 +70,7 @@ def main(args):
             train_bar.set_postfix_str(f"D_loss: {d_loss.item() / 2:.4f}, G_loss: {g_loss.item():.4f}")
             batches_done = epoch * len(train_loader) + i
             if batches_done % sample_interval == 0:
-                image = gen_imgs.data[ :num_vis].reshape([num_vis, 1, 28, 28])
+                image = gen_imgs.data[:num_vis].reshape([num_vis, 1, 28, 28])
                 real_image = real_imgs.data[:25, 0].reshape([-1, 1, 28, 28])
                 image = torch.cat([real_image, image], dim=0)
                 if vis:

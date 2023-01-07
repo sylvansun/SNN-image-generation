@@ -90,6 +90,7 @@ class Discriminator(nn.Module):
 
         return torch.stack(mem3_rec, dim=0)
 
+
 if __name__ == "__main__":
     gen = Generator()
     dis = Discriminator()

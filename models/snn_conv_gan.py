@@ -4,6 +4,7 @@ import torch.nn as nn
 from snntorch import surrogate
 import torch.nn.functional as F
 
+
 class Generator(nn.Module):
     def __init__(
         self,
@@ -54,7 +55,6 @@ class Generator(nn.Module):
             spk5, mem5 = self.lif5(cur5, mem5)
             spk5_rec.append(spk5)
             mem5_rec.append(self.tanh(mem5))
-            
 
         return torch.stack(spk5_rec, dim=0), torch.stack(mem5_rec, dim=0)
 
@@ -68,11 +68,11 @@ class Discriminator(nn.Module):
         spike_grad = surrogate.fast_sigmoid(slope=25)
         self.conv1 = nn.Conv2d(1, 12, 5)
         self.maxpool = nn.MaxPool2d(2)
-        self.lif1 = snn.Leaky(beta=beta,spike_grad=spike_grad)
+        self.lif1 = snn.Leaky(beta=beta, spike_grad=spike_grad)
         self.conv2 = nn.Conv2d(12, 64, 5)
-        self.lif2 = snn.Leaky(beta=beta,spike_grad=spike_grad)
-        self.fc1 = nn.Linear(64*4*4, dis_num_outputs)
-        self.lif3 = snn.Leaky(beta=beta,spike_grad=spike_grad)
+        self.lif2 = snn.Leaky(beta=beta, spike_grad=spike_grad)
+        self.fc1 = nn.Linear(64 * 4 * 4, dis_num_outputs)
+        self.lif3 = snn.Leaky(beta=beta, spike_grad=spike_grad)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -85,7 +85,7 @@ class Discriminator(nn.Module):
         mem3_rec = []
 
         for step in range(self.num_steps):
-            cur1 = self.maxpool(self.conv1(x.view(x.shape[0],1,28,28)))
+            cur1 = self.maxpool(self.conv1(x.view(x.shape[0], 1, 28, 28)))
             spk1, mem1 = self.lif1(cur1, mem1)
             cur2 = self.maxpool(self.conv2(spk1))
             spk2, mem2 = self.lif2(cur2, mem2)
@@ -95,6 +95,7 @@ class Discriminator(nn.Module):
             mem3_rec.append(self.sigmoid(mem3))
 
         return torch.stack(spk3_rec, dim=0), torch.stack(mem3_rec, dim=0)
+
 
 if __name__ == "__main__":
     gen = Generator()
