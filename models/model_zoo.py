@@ -8,7 +8,7 @@ class GenFront(nn.Module):
         super().__init__()
 
         self.init_size = args.img_size // 4
-        self.Num = 200
+        self.Num = args.num_steps
         self.l1 = nn.Linear(args.latent_dim, 128 * self.init_size ** 2)
         self.bn1 = nn.BatchNorm2d(128)
         self.up1 = nn.Upsample(scale_factor=2)
@@ -48,10 +48,6 @@ class GenFront(nn.Module):
         out = self.bn3(out)
         out = self.lrelu2(out)
         out = self.conv3(out)
-        # out = self.conv_last(spk_rec.transpose(0, 1).reshape(B, -1, 32, 32))
-        # out = F.relu(out)
-        # out = self.fc_last(out.view(B, -1))
-        # out = out.view(B, 1, 32, 32)
         out = self.tanh(out)
         return out
 
@@ -65,7 +61,7 @@ class GenMid(nn.Module):
         self.l1 = nn.Linear(args.latent_dim, 128 * self.init_size ** 2)
         self.bn1 = nn.BatchNorm2d(128)
         self.up1 = nn.Upsample(scale_factor=2)
-        self.conv1 = nn.Conv2d(args.gen_channels[0], args.gen_channels[1], 3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(128, 0.8)
         self.lrelu1 = nn.LeakyReLU(0.2, inplace=True)
         self.up2 = nn.Upsample(scale_factor=2)
@@ -149,11 +145,6 @@ class GenBack(nn.Module):
             mem_rec.append(mem)
         spk_rec = torch.stack(spk_rec, dim=0) # [N, B, C, H, W]
         mem_rec = torch.stack(mem_rec, dim=0)
-
-        # out = self.conv_last(spk_rec.transpose(0, 1).reshape(B, -1, 32, 32))
-        # out = F.relu(out)
-        # out = self.fc_last(out.view(B, -1))
-        # out = out.view(B, 1, 32, 32)
         out = self.tanh(out)
         return out
 
