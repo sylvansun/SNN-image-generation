@@ -320,6 +320,31 @@ class SNNExtractor(nn.Module):
         self.Num = args.num_steps
         self.args = args
         self.lif1 = snn.Leaky(beta=0.95)
+        self.lif2 = snn.Leaky(beta=0.95)
+        self.lif3 = snn.Leaky(beta=0.95)
+        self.conv1 = nn.Conv2d(128,32,1)
+        self.conv2 = nn.Conv2d(32,16,1)
+        # self.fc_last = nn.Linear()   
+    
+    def forward(self, x):
+        mem1 = self.lif1.init_leaky()
+        mem2 = self.lif2.init_leaky()
+        spk_rec = []
+        for _ in range(self.Num):
+            cur1 = self.conv1(x)
+            spk1, mem1 = self.lif1(cur1, mem1)
+            cur2 = self.conv2(cur1)
+            spk2, mem2 = self.lif2(cur2, mem2)
+            spk_rec.append(spk2)     
+        spk_rec = torch.stack(spk_rec, dim=0)
+        return spk_rec.reshape(self.args.batch_size, -1, 32, 32)
+
+class SNNExtractorSingle(nn.Module):
+    def __init__(self,args):
+        super().__init__()
+        self.Num = args.num_steps
+        self.args = args
+        self.lif1 = snn.Leaky(beta=0.95)
     
     def forward(self, x):
         mem = self.lif1.init_leaky()
@@ -330,12 +355,14 @@ class SNNExtractor(nn.Module):
             spk_rec.append(spk)     
             mem_rec.append(mem)
         spk_rec = torch.stack(spk_rec, dim=0)
-        return spk_rec.reshape(self.args.batch_size, -1, 32, 32)
-    
+        out = spk_rec.reshape(self.args.batch_size, -1, 32, 32)
+        return out
+
+
 class Decoder(nn.Module):
     def __init__(self,args):
         super().__init__()
-        self.conv1 = nn.Conv2d(args.num_steps * 128, 64, 3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(args.num_steps * 16, 64, 3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64, 0.8)
         self.lrelu = nn.LeakyReLU(0.2, inplace=True)
         self.conv2 = nn.Conv2d(64, args.channels, 3, stride=1, padding=1)
